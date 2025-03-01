@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
+import { useTelegram } from '@/hooks/useTelegram';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadDate, setUploadDate] = useState<string | null>(null);
+  const { closeTelegram } = useTelegram();
 
   const handleFileUploaded = (file: File) => {
     setUploadedFile(file);
@@ -15,10 +17,15 @@ const Index = () => {
     setUploadDate(now.toLocaleDateString('en-US', options));
   };
 
+  const handleContinue = () => {
+    // Handle continue action
+    closeTelegram();
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Main content */}
-      <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-12 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
+      {/* Main content with reduced top padding */}
+      <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-6 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
         {/* Left side content */}
         <div className="w-full max-w-lg space-y-5 md:space-y-8">
           <div className="space-y-6">
@@ -48,6 +55,7 @@ const Index = () => {
                 </div>
                 <button
                   className="mt-4 flex items-center justify-center rounded-md bg-indigo-600 px-8 py-3 font-medium text-white hover:bg-indigo-700 transition-colors"
+                  onClick={handleContinue}
                 >
                   Продолжить
                 </button>
@@ -57,6 +65,7 @@ const Index = () => {
                 <ResumeDropzone onFileUploaded={handleFileUploaded} />
                 <button
                   className="mt-6 rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors self-center"
+                  onClick={handleContinue}
                 >
                   Продолжить
                 </button>
