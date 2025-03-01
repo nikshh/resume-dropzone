@@ -6,9 +6,10 @@ import { UploadCloud, File, X, Check, AlertCircle } from 'lucide-react';
 
 interface ResumeDropzoneProps {
   className?: string;
+  onFileUploaded?: (file: File) => void;
 }
 
-const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className }) => {
+const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUploaded }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -102,6 +103,9 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className }) => {
       
       if (isSuccess) {
         setUploadStatus('success');
+        if (onFileUploaded) {
+          onFileUploaded(file);
+        }
         toast({
           title: "Resume uploaded",
           description: `Your resume "${file.name}" has been successfully uploaded.`,
@@ -124,8 +128,13 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className }) => {
     }
   };
 
+  // If we already have a file and it's uploaded successfully, let's not render the dropzone
+  if (file && uploadStatus === 'success' && onFileUploaded) {
+    return null;
+  }
+
   return (
-    <div className={cn("w-full max-w-2xl mx-auto", className)}>
+    <div className={cn("w-full mx-auto", className)}>
       <div
         className={cn(
           "resume-dropzone flex flex-col items-center justify-center p-8 h-64",
@@ -150,8 +159,8 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className }) => {
 
         {!file && !fileError && (
           <div className="flex flex-col items-center space-y-4 animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-upload-blue/40 flex items-center justify-center animate-float">
-              <UploadCloud className="h-8 w-8 text-blue-500" />
+            <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center animate-float">
+              <UploadCloud className="h-8 w-8 text-indigo-600" />
             </div>
             <div className="text-center">
               <p className="text-lg font-medium text-gray-700">Drag & drop your resume</p>
@@ -166,8 +175,8 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className }) => {
         {file && !fileError && (
           <div className="flex flex-col items-center space-y-4 animate-fade-in">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-upload-blue/40 flex items-center justify-center">
-                <File className="h-8 w-8 text-blue-500" />
+              <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+                <File className="h-8 w-8 text-indigo-600" />
               </div>
               <button
                 onClick={(e) => {
