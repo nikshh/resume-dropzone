@@ -8,7 +8,7 @@ const Index = () => {
       {/* Header */}
       <header className="py-6 px-4 sm:px-6 lg:px-8 border-b border-gray-100">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-medium text-gray-900">Resume Upload</h1>
+          {/* Removed "Resume Upload" header text */}
         </div>
       </header>
 
@@ -17,12 +17,9 @@ const Index = () => {
         <div className="w-full max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
           <div className="space-y-4">
             <span className="inline-block px-3 py-1 bg-upload-blue-light text-sm font-medium text-blue-600 rounded-full">
-              Career Portal
+              Prointerview
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Upload Your Resume</h2>
-            <p className="text-lg text-gray-600 max-w-xl mx-auto">
-              Share your qualifications with us. We accept PDF, DOC, DOCX, and TXT formats.
-            </p>
+            {/* Removed "Upload Your Resume" and description text */}
           </div>
           
           <div className="flex justify-center">
@@ -30,28 +27,28 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-upload-blue/40 flex items-center justify-center mb-3">
                 <span className="text-blue-600 font-semibold">1</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Prepare Your Resume</h3>
-              <p className="text-gray-600">Ensure your resume is up-to-date and saved in one of our accepted formats.</p>
+              <h3 className="text-base font-medium text-gray-900 mb-1">Prepare Your Resume</h3>
+              <p className="text-sm text-gray-600">Ensure your resume is up-to-date and saved in one of our accepted formats.</p>
             </div>
             
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-upload-blue/40 flex items-center justify-center mb-3">
                 <span className="text-blue-600 font-semibold">2</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Below</h3>
-              <p className="text-gray-600">Drag and drop your file in the designated area or click to browse your files.</p>
+              <h3 className="text-base font-medium text-gray-900 mb-1">Upload Below</h3>
+              <p className="text-sm text-gray-600">Drag and drop your file in the designated area or click to browse your files.</p>
             </div>
             
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-upload-blue/40 flex items-center justify-center mb-3">
                 <span className="text-blue-600 font-semibold">3</span>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Submit & Wait</h3>
-              <p className="text-gray-600">After uploading, our system will process your resume for your application.</p>
+              <h3 className="text-base font-medium text-gray-900 mb-1">Submit & Wait</h3>
+              <p className="text-sm text-gray-600">After uploading, our system will process your resume for your application.</p>
             </div>
           </div>
         </div>
