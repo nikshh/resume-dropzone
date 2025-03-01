@@ -32,7 +32,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Main content with reduced top padding */}
-      <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-6 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
+      <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-2 sm:py-4 md:py-6 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
         {/* Left side content */}
         <div className="w-full max-w-lg space-y-5 md:space-y-8">
           <div className="space-y-6">
