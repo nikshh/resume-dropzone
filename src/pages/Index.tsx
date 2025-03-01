@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
-import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -35,11 +34,11 @@ const Index = () => {
       {/* Header with branding and info block */}
       <header className="w-full flex justify-between items-center px-6 sm:px-8 lg:px-12 pt-4">
         <div className="bg-blue-100 px-4 py-1.5 rounded-full flex items-center">
-          <span className="text-blue-600 font-semibold tracking-wide opacity-85">Prointerview</span>
+          <span className="text-blue-800 font-medium">Prointerview</span>
         </div>
-        <Link to="/faq" className="text-gray-600 text-sm font-medium hover:text-indigo-600 transition-colors">
+        <div className="text-gray-600 text-sm font-medium">
           Ответы на вопросы
-        </Link>
+        </div>
       </header>
       
       {/* Main content with reduced top padding */}
