@@ -8,6 +8,8 @@ declare global {
           query_id?: string;
         };
         close: () => void;
+        expand: () => void;
+        isExpanded: boolean;
         MainButton: {
           text: string;
           show: () => void;
@@ -26,7 +28,9 @@ export function useTelegram() {
     tg,
     user: tg?.initDataUnsafe?.user,
     queryId: tg?.initDataUnsafe?.query_id,
+    isExpanded: tg?.isExpanded || false,
     onClose: () => tg?.close(),
-    closeTelegram: () => tg?.close()
+    closeTelegram: () => tg?.close(),
+    expandTelegram: () => tg?.expand(),
   };
 }

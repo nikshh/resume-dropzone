@@ -7,7 +7,14 @@ import { useTelegram } from '@/hooks/useTelegram';
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadDate, setUploadDate] = useState<string | null>(null);
-  const { closeTelegram } = useTelegram();
+  const { closeTelegram, expandTelegram, isExpanded } = useTelegram();
+
+  useEffect(() => {
+    // Expand the Telegram Web App when component mounts
+    if (!isExpanded) {
+      expandTelegram();
+    }
+  }, [isExpanded, expandTelegram]);
 
   const handleFileUploaded = (file: File) => {
     setUploadedFile(file);
