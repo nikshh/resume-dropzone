@@ -23,11 +23,10 @@ const Index = () => {
         <div className="w-full max-w-lg space-y-5 md:space-y-8">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-              Get hired for<span className="border-l-4 border-indigo-600 pl-3 ml-3"></span><br />
-              with Prointerview.
+              Первый шаг к работе мечты.
             </h1>
             <p className="text-xl text-gray-600">
-              Join 300,000+ professionals in landing your remote dream job.
+              Загрузите ваше резюме и мы сможем начать интервью.
             </p>
           </div>
         </div>
