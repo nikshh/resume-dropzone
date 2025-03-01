@@ -17,13 +17,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with logo text */}
-      <header className="py-4 px-6 sm:px-8 lg:px-12 flex justify-center items-center">
-        <div className="text-2xl md:text-3xl font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg">
-          Prointerview
-        </div>
-      </header>
-
       {/* Main content */}
       <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-12 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
         {/* Left side content */}
@@ -56,32 +49,23 @@ const Index = () => {
                 </div>
                 <button
                   className="mt-4 flex items-center justify-center rounded-md bg-indigo-600 px-8 py-3 font-medium text-white hover:bg-indigo-700 transition-colors"
-                  onClick={() => {/* Handle next action */}}
                 >
-                  <Upload className="mr-2 h-5 w-5" />
-                  Upload resume
+                  Продолжить
                 </button>
               </div>
             ) : (
-              <ResumeDropzone onFileUploaded={handleFileUploaded} />
+              <div className="flex flex-col">
+                <ResumeDropzone onFileUploaded={handleFileUploaded} />
+                <button
+                  className="mt-6 rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors self-center"
+                >
+                  Продолжить
+                </button>
+              </div>
             )}
           </div>
         </div>
       </main>
-
-      {/* Next step button - only on mobile it will be at the bottom */}
-      <div className="md:hidden fixed bottom-6 right-6">
-        <button className="rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors">
-          Next step
-        </button>
-      </div>
-
-      {/* Next step button - on desktop it will be in the corner */}
-      <div className="hidden md:block fixed bottom-8 right-8">
-        <button className="rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors">
-          Next step
-        </button>
-      </div>
     </div>
   );
 };
