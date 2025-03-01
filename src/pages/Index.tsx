@@ -17,14 +17,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with logo and questions button */}
-      <header className="py-4 px-6 sm:px-8 lg:px-12 flex justify-between items-center">
-        <div className="text-4xl font-bold text-indigo-600">
-          M
+      {/* Header with logo text */}
+      <header className="py-4 px-6 sm:px-8 lg:px-12 flex justify-center items-center">
+        <div className="text-2xl md:text-3xl font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg">
+          Prointerview
         </div>
-        <button className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 transition-colors">
-          Questions?
-        </button>
       </header>
 
       {/* Main content */}
