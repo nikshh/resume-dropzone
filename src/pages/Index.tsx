@@ -31,6 +31,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {/* Header with branding and info block */}
+      <header className="w-full flex justify-between items-center px-6 sm:px-8 lg:px-12 pt-4">
+        <div className="bg-blue-100 px-4 py-1.5 rounded-full flex items-center">
+          <span className="text-blue-800 font-medium">Prointerview</span>
+        </div>
+        <div className="text-gray-600 text-sm font-medium">
+          Ответы на вопросы
+        </div>
+      </header>
+      
       {/* Main content with reduced top padding */}
       <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-2 sm:py-4 md:py-6 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
         {/* Left side content */}
@@ -45,9 +55,9 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Right side upload card */}
+        {/* Right side upload card with blue shadow */}
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 shadow-[0_10px_35px_-5px_rgba(59,130,246,0.3)]">
             {uploadedFile ? (
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="w-16 h-16 flex items-center justify-center">
