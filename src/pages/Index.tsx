@@ -1,12 +1,77 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import ResumeDropzone from '@/components/ResumeDropzone';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Header */}
+      <header className="py-6 px-4 sm:px-6 lg:px-8 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-medium text-gray-900">Resume Upload</h1>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 flex flex-col items-center justify-between py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
+          <div className="space-y-4">
+            <span className="inline-block px-3 py-1 bg-upload-blue-light text-sm font-medium text-blue-600 rounded-full">
+              Career Portal
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Upload Your Resume</h2>
+            <p className="text-lg text-gray-600 max-w-xl mx-auto">
+              Share your qualifications with us. We accept PDF, DOC, DOCX, and TXT formats.
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <div className="w-24 h-1 bg-upload-blue rounded-full"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+                <span className="text-blue-600 font-semibold">1</span>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Prepare Your Resume</h3>
+              <p className="text-gray-600">Ensure your resume is up-to-date and saved in one of our accepted formats.</p>
+            </div>
+            
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+                <span className="text-blue-600 font-semibold">2</span>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Below</h3>
+              <p className="text-gray-600">Drag and drop your file in the designated area or click to browse your files.</p>
+            </div>
+            
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-upload-blue/40 flex items-center justify-center mb-4">
+                <span className="text-blue-600 font-semibold">3</span>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Submit & Wait</h3>
+              <p className="text-gray-600">After uploading, our system will process your resume for your application.</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Upload area at the bottom */}
+        <div className="w-full mt-12 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <ResumeDropzone />
+          
+          <p className="text-center text-xs text-gray-500 mt-4">
+            By uploading your resume, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+          </p>
+        </div>
+      </main>
+      
+      {/* Footer */}
+      <footer className="py-6 px-4 sm:px-6 lg:px-8 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto text-center text-sm text-gray-500">
+          <p>© {new Date().getFullYear()} Resume Upload Portal. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 };
