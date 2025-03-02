@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { cn } from '@/lib/utils';
@@ -20,9 +19,11 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
     'application/pdf', 
     'application/msword', 
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-    'text/plain'
+    'text/plain',
+    'application/rtf',
+    'text/rtf'
   ];
-  const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt'];
+  const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt', '.rtf'];
 
   const validateFile = (file: File): boolean => {
     if (!file) return false;
@@ -151,7 +152,7 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.doc,.docx,.txt"
+          accept=".pdf,.doc,.docx,.txt,.rtf"
           onChange={handleFileChange}
           className="hidden"
           aria-label="Upload resume"
@@ -166,7 +167,7 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
               <p className="text-lg font-medium text-gray-700">Drag & drop your resume</p>
               <p className="text-sm text-gray-500 mt-1">or click to browse files</p>
               <p className="text-xs text-gray-400 mt-4">
-                Supported formats: PDF, DOC, DOCX, TXT (Max size: 10MB)
+                Supported formats: PDF, DOC, DOCX, TXT, RTF (Max size: 10MB)
               </p>
             </div>
           </div>

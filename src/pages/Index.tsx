@@ -1,13 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
+import axios from 'axios';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadDate, setUploadDate] = useState<string | null>(null);
-  const { closeTelegram, expandTelegram, isExpanded } = useTelegram();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   useEffect(() => {
     // Expand the Telegram Web App when component mounts
@@ -24,9 +26,34 @@ const Index = () => {
     setUploadDate(now.toLocaleDateString('en-US', options));
   };
 
-  const handleContinue = () => {
-    // Handle continue action
-    closeTelegram();
+  const handleContinue = async () => {
+    if (uploadedFile) {
+      try {
+        setIsUploading(true);
+        setUploadError(null);
+        
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        
+        // Добавляем telegram_id, если у нас есть доступ к пользователю
+        if (user && user.id) {
+          formData.append('telegram_id', user.id.toString());
+        }
+        
+        const response = await axios.post('http://prointerview.ru/resume/upload', formData);
+        
+        // Если успешно, закрываем Telegram Web App
+        closeTelegram();
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        setUploadError('Ошибка при отправке файла. Пожалуйста, попробуйте снова.');
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      // Если файла нет, просто закрываем Telegram Web App
+      closeTelegram();
+    }
   };
 
   return (
@@ -73,9 +100,13 @@ const Index = () => {
                 <button
                   className="mt-4 flex items-center justify-center rounded-md bg-indigo-600 px-8 py-3 font-medium text-white hover:bg-indigo-700 transition-colors"
                   onClick={handleContinue}
+                  disabled={isUploading}
                 >
-                  Продолжить
+                  {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
+                {uploadError && (
+                  <p className="mt-2 text-sm text-red-500">{uploadError}</p>
+                )}
               </div>
             ) : (
               <div className="flex flex-col">
@@ -83,9 +114,13 @@ const Index = () => {
                 <button
                   className="mt-6 rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors self-center"
                   onClick={handleContinue}
+                  disabled={isUploading}
                 >
-                  Продолжить
+                  {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
+                {uploadError && (
+                  <p className="mt-2 text-sm text-red-500 text-center">{uploadError}</p>
+                )}
               </div>
             )}
           </div>
