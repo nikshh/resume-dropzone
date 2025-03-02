@@ -46,34 +46,7 @@ const Index = () => {
         closeTelegram();
       } catch (error) {
         console.error('Error uploading file:', error);
-        
-        // Извлекаем подробное сообщение об ошибке
-        let errorMessage = 'Ошибка при отправке файла. Пожалуйста, попробуйте снова.';
-        
-        if (axios.isAxiosError(error)) {
-          // Если это ошибка Axios, пытаемся получить детальное сообщение
-          if (error.response) {
-            // Сервер прислал ответ с ошибкой
-            if (error.response.data && error.response.data.message) {
-              errorMessage = `Ошибка: ${error.response.data.message}`;
-            } else if (typeof error.response.data === 'string') {
-              errorMessage = `Ошибка: ${error.response.data}`;
-            } else {
-              errorMessage = `Ошибка сервера: ${error.response.status} ${error.response.statusText}`;
-            }
-          } else if (error.request) {
-            // Запрос был сделан, но не получен ответ
-            errorMessage = 'Сервер не отвечает. Проверьте ваше подключение к интернету.';
-          } else {
-            // Ошибка при настройке запроса
-            errorMessage = `Ошибка: ${error.message}`;
-          }
-        } else if (error instanceof Error) {
-          // Если это обычная ошибка JavaScript
-          errorMessage = `Ошибка: ${error.message}`;
-        }
-        
-        setUploadError(errorMessage);
+        setUploadError(`Ошибка: ${error.message}`);
       } finally {
         setIsUploading(false);
       }
