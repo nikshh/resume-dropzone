@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { cn } from '@/lib/utils';
 import { UploadCloud, File, X, Check, AlertCircle } from 'lucide-react';
@@ -14,6 +14,7 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
   const [fileError, setFileError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
   
   const allowedFileTypes = [
     'application/pdf', 
@@ -76,11 +77,37 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
     }
   };
 
+  // Определяем, является ли устройство мобильным
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent;
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      setIsMobile(mobileRegex.test(userAgent));
+    };
+    
+    checkMobile();
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && validateFile(selectedFile)) {
-      setFile(selectedFile);
-      handleUpload(selectedFile);
+      // Для мобильных добавляем небольшую задержку перед обработкой
+      if (isMobile) {
+        console.log("Мобильное устройство обнаружено, файл:", {
+          name: selectedFile.name,
+          size: selectedFile.size,
+          type: selectedFile.type
+        });
+        
+        // Добавляем небольшую задержку для мобильных устройств
+        setTimeout(() => {
+          setFile(selectedFile);
+          handleUpload(selectedFile);
+        }, 300);
+      } else {
+        setFile(selectedFile);
+        handleUpload(selectedFile);
+      }
     }
   };
 
@@ -141,6 +168,7 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
           "resume-dropzone flex flex-col items-center justify-center p-8 h-64",
           isDragging ? "drag-active animate-pulse-light" : "",
           fileError ? "border-red-300 bg-red-50 shadow-[0_5px_25px_-5px_rgba(255,200,200,0.4)]" : "",
+          isMobile ? "mobile-dropzone" : "",
           className
         )}
         onDragEnter={handleDragEnter}
@@ -156,6 +184,7 @@ const ResumeDropzone: React.FC<ResumeDropzoneProps> = ({ className, onFileUpload
           onChange={handleFileChange}
           className="hidden"
           aria-label="Upload resume"
+          // Для мобильных устройств мы не используем capture, так как это может вызвать проблемы
         />
 
         {!file && !fileError && (

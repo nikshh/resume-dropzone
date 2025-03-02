@@ -9,6 +9,7 @@ const Index = () => {
   const [uploadDate, setUploadDate] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   // Базовый URL API (можно вынести в env-переменные)
@@ -20,6 +21,20 @@ const Index = () => {
       expandTelegram();
     }
   }, [isExpanded, expandTelegram]);
+
+  // Определяем, является ли устройство мобильным
+  useEffect(() => {
+    const userAgent = navigator.userAgent;
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    setIsMobile(mobileRegex.test(userAgent));
+    
+    // Логируем информацию о платформе
+    console.log('Устройство:', {
+      userAgent,
+      isMobile: mobileRegex.test(userAgent),
+      platform: navigator.platform
+    });
+  }, []);
 
   const handleFileUploaded = (file: File) => {
     setUploadedFile(file);
@@ -47,25 +62,48 @@ const Index = () => {
           formData.append('telegram_id', '12345678');
         }
         
-        // Логгирование формы для отладки
         console.log('Отправляемые данные:', {
           fileSize: uploadedFile.size,
           fileName: uploadedFile.name,
           hasUser: !!user,
-          userId: user?.id
+          userId: user?.id,
+          isMobile
         });
         
-        // Добавляем настройки для axios, чтобы обойти проблемы с CORS и незащищенными соединениями
-        const response = await axios.post(`${API_URL}/resume/upload`, formData, {
+        // Настройки для мобильных и десктопных устройств отличаются
+        const config = {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Accept': 'application/json',
           },
           withCredentials: false,
-          timeout: 30000, // 30-секундный таймаут для запроса
-        });
+          timeout: isMobile ? 90000 : 60000, // Увеличенный таймаут для мобильных
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Прогресс загрузки: ${percentCompleted}%`);
+          }
+        };
         
-        console.log('Ответ сервера:', response.data);
+        // Для мобильных устройств используем более простую конфигурацию
+        if (isMobile) {
+          console.log('Используем мобильную конфигурацию для запроса');
+          // На мобильных устройствах размер чанка меньше
+          const response = await axios.post(`${API_URL}/resume/upload`, formData, config);
+          console.log('Ответ сервера:', response.data);
+        } else {
+          console.log('Используем десктопную конфигурацию для запроса');
+          // Добавляем httpsAgent только для десктопных устройств
+          const configWithAgent = {
+            ...config,
+            httpsAgent: axios.create({
+              httpsAgent: {
+                rejectUnauthorized: false
+              }
+            }).defaults.httpsAgent
+          };
+          const response = await axios.post(`${API_URL}/resume/upload`, formData, configWithAgent);
+          console.log('Ответ сервера:', response.data);
+        }
         
         // Если успешно, закрываем Telegram Web App
         closeTelegram();
@@ -74,10 +112,25 @@ const Index = () => {
         
         // Улучшенная обработка ошибок
         if (error.message === 'Network Error') {
-          setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
+          console.log('Детали ошибки сети:', { 
+            errorName: error.name, 
+            errorStack: error.stack,
+            userAgent: navigator.userAgent,
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+          });
+          setUploadError('Ошибка сети. Пожалуйста, проверьте подключение к интернету и попробуйте загрузить файл через Wi-Fi.');
         } else if (error.response) {
           // Сервер ответил с кодом ошибки
-          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
+          console.log('Детали ответа сервера:', {
+            status: error.response.status,
+            headers: error.response.headers,
+            data: error.response.data
+          });
+          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data?.message || 'Неизвестная ошибка'}`);
+        } else if (error.request) {
+          // Запрос был сделан, но ответ не получен
+          console.log('Запрос отправлен, но ответ не получен:', error.request);
+          setUploadError('Сервер не отвечает. Пожалуйста, попробуйте позже.');
         } else {
           setUploadError(`Ошибка: ${error.message}`);
         }
