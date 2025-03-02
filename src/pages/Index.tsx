@@ -12,7 +12,7 @@ const Index = () => {
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   // Базовый URL API (можно вынести в env-переменные)
-  const API_URL = 'http://prointerview.ru';
+  const API_URL = 'https://prointerview.ru';
 
   useEffect(() => {
     // Expand the Telegram Web App when component mounts
