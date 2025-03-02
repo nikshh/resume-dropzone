@@ -11,49 +11,14 @@ const Index = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
-  // API URL with HTTPS to ensure secure connections on mobile
+  // Базовый URL API (можно вынести в env-переменные)
   const API_URL = 'http://prointerview.ru';
 
-  // Функция для проверки CORS настроек на сервере
-  const checkServerCorsSettings = async () => {
-    try {
-      const response = await fetch(`${API_URL}/resume/upload`, {
-        method: 'OPTIONS',
-        headers: {
-          'Origin': window.location.origin,
-          'Access-Control-Request-Method': 'POST',
-          'Access-Control-Request-Headers': 'Content-Type,Accept',
-        },
-      });
-      
-      console.log('CORS check response:', {
-        ok: response.ok,
-        status: response.status,
-        headers: {
-          'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
-          'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
-          'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
-        }
-      });
-      
-      return response.ok;
-    } catch (error) {
-      console.warn('CORS check failed:', error);
-      return false;
-    }
-  };
-  
   useEffect(() => {
     // Expand the Telegram Web App when component mounts
     if (!isExpanded) {
       expandTelegram();
     }
-    
-    // Проверка CORS настроек при загрузке
-    checkServerCorsSettings()
-      .then(corsSupported => {
-        console.log('CORS properly configured:', corsSupported);
-      });
   }, [isExpanded, expandTelegram]);
 
   const handleFileUploaded = (file: File) => {
@@ -73,118 +38,54 @@ const Index = () => {
         const formData = new FormData();
         formData.append('file', uploadedFile);
         
-        // Add telegram_id if user exists
+        // Добавляем telegram_id, если у нас есть доступ к пользователю
         if (user && user.id) {
           formData.append('telegram_id', user.id.toString());
         } else {
-          // Fallback ID for testing
+          // Временное решение - используем mock ID если нет доступа к пользователю
+          // В реальном приложении это должно быть удалено
           formData.append('telegram_id', '12345678');
         }
         
-        // Debug logging
-        console.log('Upload data:', {
+        // Логгирование формы для отладки
+        console.log('Отправляемые данные:', {
           fileSize: uploadedFile.size,
           fileName: uploadedFile.name,
           hasUser: !!user,
-          userId: user?.id,
-          apiUrl: API_URL
+          userId: user?.id
         });
         
-        // Попробуем использовать XMLHttpRequest вместо axios для обхода ограничений
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_URL}/resume/upload`, true);
-        xhr.timeout = 60000; // 60 секунд таймаут
+        // Добавляем настройки для axios, чтобы обойти проблемы с CORS и незащищенными соединениями
+        const response = await axios.post(`${API_URL}/resume/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+          withCredentials: false,
+          timeout: 30000, // 30-секундный таймаут для запроса
+        });
         
-        // Слушаем прогресс загрузки (опционально)
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const percentComplete = (e.loaded / e.total) * 100;
-            console.log(`Загрузка: ${percentComplete.toFixed(2)}%`);
-          }
-        };
+        console.log('Ответ сервера:', response.data);
         
-        // Обработка результата
-        xhr.onload = function() {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            console.log('Успешная загрузка:', xhr.responseText);
-            closeTelegram();
-          } else {
-            console.error('Ошибка сервера:', xhr.status, xhr.statusText);
-            setUploadError(`Ошибка сервера: ${xhr.status} - ${xhr.statusText}`);
-          }
-          setIsUploading(false);
-        };
-        
-        // Обработка ошибок
-        xhr.onerror = function() {
-          console.error('Ошибка сети при использовании XMLHttpRequest');
-          
-          // Если XMLHttpRequest не сработал, пробуем через axios с модифицированными настройками
-          console.log('Пробуем альтернативный метод через axios...');
-          
-          axios.post(`${API_URL}/resume/upload`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              'Accept': 'application/json',
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache'
-            },
-            withCredentials: false,
-            timeout: 60000,
-            // Отключаем настройки безопасности, которые могут блокировать HTTP
-            httpsAgent: false,
-          }).then(response => {
-            console.log('Server response (axios):', response.data);
-            closeTelegram();
-            setIsUploading(false);
-          }).catch(axiosError => {
-            console.error('Axios upload error details:', axiosError);
-            
-            let errorMsg = 'Неизвестная ошибка при загрузке';
-            if (axiosError.message === 'Network Error') {
-              errorMsg = 'Ошибка сети.';
-            } else if (axiosError.response) {
-              errorMsg = `Ошибка сервера: ${axiosError.response.status} - ${axiosError.response.data?.message || 'Неизвестная ошибка'}`;
-            } else if (axiosError.request) {
-              errorMsg = 'Сервер не отвечает. Пожалуйста, попробуйте позже.';
-            } else {
-              errorMsg = `Ошибка: ${axiosError.message || 'Неизвестная ошибка'}`;
-            }
-            
-            setUploadError(errorMsg);
-            setIsUploading(false);
-          });
-        };
-        
-        // Обработка таймаута
-        xhr.ontimeout = function() {
-          console.error('Превышено время ожидания запроса');
-          setUploadError('Превышено время ожидания запроса. Проверьте скорость интернет-соединения.');
-          setIsUploading(false);
-        };
-        
-        // Отправляем запрос
-        xhr.send(formData);
-        
+        // Если успешно, закрываем Telegram Web App
+        closeTelegram();
       } catch (error) {
-        console.error('Upload error details:', error);
+        console.error('Error uploading file:', error);
         
-        // Enhanced error handling
+        // Улучшенная обработка ошибок
         if (error.message === 'Network Error') {
-          setUploadError('Ошибка сети. Пожалуйста, проверьте подключение к интернету и попробуйте снова.');
+          setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
         } else if (error.response) {
-          // Server responded with error code
-          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data?.message || 'Неизвестная ошибка'}`);
-        } else if (error.request) {
-          // Request made but no response received
-          setUploadError('Сервер не отвечает. Пожалуйста, попробуйте позже.');
+          // Сервер ответил с кодом ошибки
+          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
         } else {
-          setUploadError(`Ошибка: ${error.message || 'Неизвестная ошибка'}`);
+          setUploadError(`Ошибка: ${error.message}`);
         }
+      } finally {
         setIsUploading(false);
       }
     } else {
-      // Close Telegram Web App if no file
+      // Если файла нет, просто закрываем Telegram Web App
       closeTelegram();
     }
   };
