@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
-import axios from 'axios';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -55,25 +54,31 @@ const Index = () => {
           userId: user?.id
         });
         
-        // Добавляем настройки для axios, чтобы обойти проблемы с CORS и незащищенными соединениями
-        const response = await axios.post(`${API_URL}/resume/upload`, formData, {
+        // Используем fetch вместо axios для лучшей совместимости с мобильными устройствами
+        const response = await fetch(`${API_URL}/resume/upload`, {
+          method: 'POST',
+          mode: 'cors',
           headers: {
-            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json',
           },
-          withCredentials: false,
-          timeout: 30000, // 30-секундный таймаут для запроса
+          body: formData,
         });
         
-        console.log('Ответ сервера:', response.data);
-        
-        // Если успешно, закрываем Telegram Web App
-        closeTelegram();
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Ответ сервера:', data);
+          
+          // Если успешно, закрываем Telegram Web App
+          closeTelegram();
+        } else {
+          const errorData = await response.json().catch(() => ({ message: 'Неизвестная ошибка сервера' }));
+          throw new Error(errorData.message || `Ошибка сервера: ${response.status}`);
+        }
       } catch (error) {
         console.error('Error uploading file:', error);
         
         // Улучшенная обработка ошибок
-        if (error.message === 'Network Error') {
+        if (error.message === 'Network Error' || error.name === 'TypeError') {
           setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
         } else if (error.response) {
           // Сервер ответил с кодом ошибки
