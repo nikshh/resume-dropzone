@@ -11,6 +11,9 @@ const Index = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
+  // Базовый URL API (можно вынести в env-переменные)
+  const API_URL = 'http://prointerview.ru';
+
   useEffect(() => {
     // Expand the Telegram Web App when component mounts
     if (!isExpanded) {
@@ -38,15 +41,46 @@ const Index = () => {
         // Добавляем telegram_id, если у нас есть доступ к пользователю
         if (user && user.id) {
           formData.append('telegram_id', user.id.toString());
+        } else {
+          // Временное решение - используем mock ID если нет доступа к пользователю
+          // В реальном приложении это должно быть удалено
+          formData.append('telegram_id', '12345678');
         }
         
-        const response = await axios.post('http://prointerview.ru/resume/upload', formData);
+        // Логгирование формы для отладки
+        console.log('Отправляемые данные:', {
+          fileSize: uploadedFile.size,
+          fileName: uploadedFile.name,
+          hasUser: !!user,
+          userId: user?.id
+        });
+        
+        // Добавляем настройки для axios, чтобы обойти проблемы с CORS и незащищенными соединениями
+        const response = await axios.post(`${API_URL}/resume/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json',
+          },
+          withCredentials: false,
+          timeout: 30000, // 30-секундный таймаут для запроса
+        });
+        
+        console.log('Ответ сервера:', response.data);
         
         // Если успешно, закрываем Telegram Web App
         closeTelegram();
       } catch (error) {
         console.error('Error uploading file:', error);
-        setUploadError(`Ошибка: ${error.message}`);
+        
+        // Улучшенная обработка ошибок
+        if (error.message === 'Network Error') {
+          setUploadError('Ошибка сети. Возможно, проблема с CORS или сервер недоступен. Пожалуйста, попробуйте позже.');
+        } else if (error.response) {
+          // Сервер ответил с кодом ошибки
+          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
+        } else {
+          setUploadError(`Ошибка: ${error.message}`);
+        }
       } finally {
         setIsUploading(false);
       }
