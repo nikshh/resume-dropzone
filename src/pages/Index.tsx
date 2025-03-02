@@ -2,18 +2,23 @@ import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
+import axios from 'axios';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadDate, setUploadDate] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
-  // Базовый URL API (можно вынести в env-переменные)
+  // Базовый URL API (без https)
   const API_URL = 'http://prointerview.ru';
 
   useEffect(() => {
+    // Определяем, является ли устройство мобильным
+    const mobileCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobile(mobileCheck);
     // Expand the Telegram Web App when component mounts
     if (!isExpanded) {
       expandTelegram();
@@ -28,60 +33,54 @@ const Index = () => {
     setUploadDate(now.toLocaleDateString('en-US', options));
   };
 
+  // Обработчик изменения файла для fallback input
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      handleFileUploaded(event.target.files[0]);
+    }
+  };
+
   const handleContinue = async () => {
     if (uploadedFile) {
       try {
         setIsUploading(true);
         setUploadError(null);
-        
+
         const formData = new FormData();
         formData.append('file', uploadedFile);
-        
+
         // Добавляем telegram_id, если у нас есть доступ к пользователю
         if (user && user.id) {
           formData.append('telegram_id', user.id.toString());
         } else {
           // Временное решение - используем mock ID если нет доступа к пользователю
-          // В реальном приложении это должно быть удалено
           formData.append('telegram_id', '12345678');
         }
-        
-        // Логгирование формы для отладки
+
         console.log('Отправляемые данные:', {
           fileSize: uploadedFile.size,
           fileName: uploadedFile.name,
           hasUser: !!user,
           userId: user?.id
         });
-        
-        // Используем fetch вместо axios для лучшей совместимости с мобильными устройствами
-        const response = await fetch(`${API_URL}/resume/upload`, {
-          method: 'POST',
-          mode: 'cors',
+
+        const response = await axios.post(`${API_URL}/resume/upload`, formData, {
           headers: {
+            'Content-Type': 'multipart/form-data',
             'Accept': 'application/json',
           },
-          body: formData,
+          withCredentials: false,
+          timeout: 30000,
         });
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Ответ сервера:', data);
-          
-          // Если успешно, закрываем Telegram Web App
-          closeTelegram();
-        } else {
-          const errorData = await response.json().catch(() => ({ message: 'Неизвестная ошибка сервера' }));
-          throw new Error(errorData.message || `Ошибка сервера: ${response.status}`);
-        }
-      } catch (error) {
+
+        console.log('Ответ сервера:', response.data);
+
+        closeTelegram();
+      } catch (error: any) {
         console.error('Error uploading file:', error);
-        
-        // Улучшенная обработка ошибок
-        if (error.message === 'Network Error' || error.name === 'TypeError') {
+        if (error.message === 'Network Error') {
           setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
         } else if (error.response) {
-          // Сервер ответил с кодом ошибки
           setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
         } else {
           setUploadError(`Ошибка: ${error.message}`);
@@ -90,7 +89,6 @@ const Index = () => {
         setIsUploading(false);
       }
     } else {
-      // Если файла нет, просто закрываем Telegram Web App
       closeTelegram();
     }
   };
@@ -149,7 +147,11 @@ const Index = () => {
               </div>
             ) : (
               <div className="flex flex-col">
-                <ResumeDropzone onFileUploaded={handleFileUploaded} />
+                {isMobile ? (
+                  <input type="file" accept="*/*" onChange={handleInputChange} className="border p-2 rounded-md" />
+                ) : (
+                  <ResumeDropzone onFileUploaded={handleFileUploaded} />
+                )}
                 <button
                   className="mt-6 rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors self-center"
                   onClick={handleContinue}
