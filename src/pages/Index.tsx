@@ -74,7 +74,7 @@ const Index = () => {
         
         // Улучшенная обработка ошибок
         if (error.message === 'Network Error') {
-          setUploadError('Ошибка сети. Возможно, проблема с CORS или сервер недоступен. Пожалуйста, попробуйте позже.');
+          setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
         } else if (error.response) {
           // Сервер ответил с кодом ошибки
           setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
