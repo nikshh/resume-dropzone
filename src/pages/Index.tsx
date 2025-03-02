@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload } from 'lucide-react';
@@ -11,8 +12,8 @@ const Index = () => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
-  // Базовый URL API (можно вынести в env-переменные)
-  const API_URL = 'http://prointerview.ru';
+  // API URL with HTTPS to ensure secure connections on mobile
+  const API_URL = 'https://prointerview.ru';
 
   useEffect(() => {
     // Expand the Telegram Web App when component mounts
@@ -38,54 +39,57 @@ const Index = () => {
         const formData = new FormData();
         formData.append('file', uploadedFile);
         
-        // Добавляем telegram_id, если у нас есть доступ к пользователю
+        // Add telegram_id if user exists
         if (user && user.id) {
           formData.append('telegram_id', user.id.toString());
         } else {
-          // Временное решение - используем mock ID если нет доступа к пользователю
-          // В реальном приложении это должно быть удалено
+          // Fallback ID for testing
           formData.append('telegram_id', '12345678');
         }
         
-        // Логгирование формы для отладки
-        console.log('Отправляемые данные:', {
+        // Debug logging
+        console.log('Upload data:', {
           fileSize: uploadedFile.size,
           fileName: uploadedFile.name,
           hasUser: !!user,
-          userId: user?.id
+          userId: user?.id,
+          apiUrl: API_URL
         });
         
-        // Добавляем настройки для axios, чтобы обойти проблемы с CORS и незащищенными соединениями
+        // Modified axios request with improved error handling for mobile devices
         const response = await axios.post(`${API_URL}/resume/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Accept': 'application/json',
           },
           withCredentials: false,
-          timeout: 30000, // 30-секундный таймаут для запроса
+          timeout: 60000, // Extended timeout for slower mobile connections
         });
         
-        console.log('Ответ сервера:', response.data);
+        console.log('Server response:', response.data);
         
-        // Если успешно, закрываем Telegram Web App
+        // Close Telegram Web App on success
         closeTelegram();
       } catch (error) {
-        console.error('Error uploading file:', error);
+        console.error('Upload error details:', error);
         
-        // Улучшенная обработка ошибок
+        // Enhanced error handling
         if (error.message === 'Network Error') {
-          setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
+          setUploadError('Ошибка сети. Пожалуйста, проверьте подключение к интернету и попробуйте снова.');
         } else if (error.response) {
-          // Сервер ответил с кодом ошибки
-          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
+          // Server responded with error code
+          setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data?.message || 'Неизвестная ошибка'}`);
+        } else if (error.request) {
+          // Request made but no response received
+          setUploadError('Сервер не отвечает. Пожалуйста, попробуйте позже.');
         } else {
-          setUploadError(`Ошибка: ${error.message}`);
+          setUploadError(`Ошибка: ${error.message || 'Неизвестная ошибка'}`);
         }
       } finally {
         setIsUploading(false);
       }
     } else {
-      // Если файла нет, просто закрываем Telegram Web App
+      // Close Telegram Web App if no file
       closeTelegram();
     }
   };
