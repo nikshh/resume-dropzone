@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
-import { Upload } from 'lucide-react';
+import { Upload, Check } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
 import axios from 'axios';
 
@@ -9,6 +10,7 @@ const Index = () => {
   const [uploadDate, setUploadDate] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [consentChecked, setConsentChecked] = useState(false);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   // Базовый URL API (можно вынести в env-переменные)
@@ -90,6 +92,26 @@ const Index = () => {
     }
   };
 
+  // Custom checkbox component
+  const Checkbox = ({ 
+    checked, 
+    onChange 
+  }: { 
+    checked: boolean; 
+    onChange: (checked: boolean) => void 
+  }) => {
+    return (
+      <div 
+        className="inline-flex items-center cursor-pointer" 
+        onClick={() => onChange(!checked)}
+      >
+        <div className={`w-5 h-5 flex items-center justify-center rounded border ${checked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'}`}>
+          {checked && <Check className="h-3.5 w-3.5 text-white" />}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header with branding and info block */}
@@ -131,10 +153,22 @@ const Index = () => {
                   <p className="font-medium text-gray-800 break-all">{uploadedFile.name}</p>
                   <p className="text-sm text-gray-500 mt-1">Uploaded {uploadDate}</p>
                 </div>
+                
+                {/* Consent checkbox */}
+                <div className="mt-2 flex items-start space-x-2">
+                  <Checkbox 
+                    checked={consentChecked} 
+                    onChange={setConsentChecked} 
+                  />
+                  <span className="text-sm text-gray-600">
+                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
+                  </span>
+                </div>
+                
                 <button
-                  className="mt-4 flex items-center justify-center rounded-md bg-indigo-600 px-8 py-3 font-medium text-white hover:bg-indigo-700 transition-colors"
+                  className={`mt-4 flex items-center justify-center rounded-md px-8 py-3 font-medium text-white transition-colors ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
-                  disabled={isUploading}
+                  disabled={isUploading || !consentChecked}
                 >
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
@@ -145,10 +179,22 @@ const Index = () => {
             ) : (
               <div className="flex flex-col">
                 <ResumeDropzone onFileUploaded={handleFileUploaded} />
+                
+                {/* Consent checkbox */}
+                <div className="mt-4 flex items-start space-x-2">
+                  <Checkbox 
+                    checked={consentChecked} 
+                    onChange={setConsentChecked} 
+                  />
+                  <span className="text-sm text-gray-600">
+                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
+                  </span>
+                </div>
+                
                 <button
-                  className="mt-6 rounded-md bg-indigo-600 px-6 py-3 font-medium text-white hover:bg-indigo-700 transition-colors self-center"
+                  className={`mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors self-center ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
-                  disabled={isUploading}
+                  disabled={isUploading || !consentChecked}
                 >
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
