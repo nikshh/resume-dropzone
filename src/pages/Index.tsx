@@ -10,7 +10,7 @@ const Index = () => {
   const [uploadDate, setUploadDate] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [consentChecked, setConsentChecked] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(true); // Changed to true for default checked
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   // Базовый URL API (можно вынести в env-переменные)
@@ -192,9 +192,9 @@ const Index = () => {
                 </div>
                 
                 <button
-                  className={`mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors self-center ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
+                  className={`mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors self-center ${consentChecked && uploadedFile ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
-                  disabled={isUploading || !consentChecked}
+                  disabled={isUploading || !consentChecked || !uploadedFile}
                 >
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
