@@ -4,6 +4,7 @@ import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload, Check } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
 import axios from 'axios';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -11,6 +12,7 @@ const Index = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [consentChecked, setConsentChecked] = useState(true); // Changed to true for default checked
+  const [isSkipping, setIsSkipping] = useState(false);
   const { closeTelegram, expandTelegram, isExpanded, user } = useTelegram();
 
   // Базовый URL API (можно вынести в env-переменные)
@@ -89,6 +91,49 @@ const Index = () => {
     } else {
       // Если файла нет, просто закрываем Telegram Web App
       closeTelegram();
+    }
+  };
+
+  const handleSkipResume = async () => {
+    try {
+      setIsSkipping(true);
+      setUploadError(null);
+      
+      // Данные для отправки на сервер
+      const data = {
+        telegramUserId: user && user.id ? user.id : '12345678'
+      };
+      
+      // Логгирование для отладки
+      console.log('Отправляемые данные для пропуска резюме:', data);
+      
+      // Отправляем запрос на эндпоинт /resume/pass
+      const response = await axios.post(`${API_URL}/resume/pass`, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        withCredentials: false,
+        timeout: 30000,
+      });
+      
+      console.log('Ответ сервера:', response.data);
+      
+      // Если успешно, закрываем Telegram Web App
+      closeTelegram();
+    } catch (error) {
+      console.error('Error skipping resume upload:', error);
+      
+      // Обработка ошибок
+      if (error.message === 'Network Error') {
+        setUploadError('Ошибка сети. Пожалуйста, попробуйте позже.');
+      } else if (error.response) {
+        setUploadError(`Ошибка сервера: ${error.response.status} - ${error.response.data.message || 'Неизвестная ошибка'}`);
+      } else {
+        setUploadError(`Ошибка: ${error.message}`);
+      }
+    } finally {
+      setIsSkipping(false);
     }
   };
 
@@ -179,6 +224,18 @@ const Index = () => {
             ) : (
               <div className="flex flex-col">
                 <ResumeDropzone onFileUploaded={handleFileUploaded} />
+                
+                {/* "Загрузить резюме позже" button */}
+                <div className="mt-4 flex justify-center">
+                  <Button 
+                    variant="outline"
+                    onClick={handleSkipResume}
+                    disabled={isSkipping}
+                    className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                  >
+                    {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
+                  </Button>
+                </div>
                 
                 {/* Consent checkbox */}
                 <div className="mt-4 flex items-start space-x-2">
