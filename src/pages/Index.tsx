@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload, Check } from 'lucide-react';
@@ -217,6 +216,7 @@ const Index = () => {
                 >
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
+                
                 {uploadError && (
                   <p className="mt-2 text-sm text-red-500">{uploadError}</p>
                 )}
@@ -224,18 +224,6 @@ const Index = () => {
             ) : (
               <div className="flex flex-col">
                 <ResumeDropzone onFileUploaded={handleFileUploaded} />
-                
-                {/* "Загрузить резюме позже" button */}
-                <div className="mt-4 flex justify-center">
-                  <Button 
-                    variant="outline"
-                    onClick={handleSkipResume}
-                    disabled={isSkipping}
-                    className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                  >
-                    {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
-                  </Button>
-                </div>
                 
                 {/* Consent checkbox */}
                 <div className="mt-4 flex items-start space-x-2">
@@ -255,6 +243,19 @@ const Index = () => {
                 >
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
+                
+                {/* "Загрузить резюме позже" button - moved here under the Continue button */}
+                <div className="mt-4 flex justify-center">
+                  <Button 
+                    variant="outline"
+                    onClick={handleSkipResume}
+                    disabled={isSkipping}
+                    className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                  >
+                    {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
+                  </Button>
+                </div>
+                
                 {uploadError && (
                   <p className="mt-2 text-sm text-red-500 text-center">{uploadError}</p>
                 )}
