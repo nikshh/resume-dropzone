@@ -210,7 +210,7 @@ const Index = () => {
                 </div>
                 
                 <button
-                  className={`mt-4 flex items-center justify-center rounded-md px-8 py-3 font-medium text-white transition-colors ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
+                  className={`w-full mt-4 flex items-center justify-center rounded-md px-8 py-3 font-medium text-white transition-colors ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
                   disabled={isUploading || !consentChecked}
                 >
@@ -237,7 +237,7 @@ const Index = () => {
                 </div>
                 
                 <button
-                  className={`mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors self-center ${consentChecked && uploadedFile ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
+                  className={`w-full mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors ${consentChecked && uploadedFile ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
                   disabled={isUploading || !consentChecked || !uploadedFile}
                 >
@@ -245,12 +245,12 @@ const Index = () => {
                 </button>
                 
                 {/* "Загрузить резюме позже" button - moved here under the Continue button */}
-                <div className="mt-4 flex justify-center">
+                <div className="mt-4 w-full">
                   <Button 
                     variant="outline"
                     onClick={handleSkipResume}
                     disabled={isSkipping}
-                    className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                    className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
                   >
                     {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
                   </Button>
