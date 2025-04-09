@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import ResumeDropzone from '@/components/ResumeDropzone';
-import { Upload, Check } from 'lucide-react';
 import { useTelegram } from '@/hooks/useTelegram';
 import axios from 'axios';
-import { Button } from '@/components/ui/button';
+import Header from '@/components/Header';
+import UploadFormCard from '@/components/UploadFormCard';
 
 const Index = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -137,37 +136,9 @@ const Index = () => {
     }
   };
 
-  // Custom checkbox component
-  const Checkbox = ({ 
-    checked, 
-    onChange 
-  }: { 
-    checked: boolean; 
-    onChange: (checked: boolean) => void 
-  }) => {
-    return (
-      <div 
-        className="inline-flex items-center cursor-pointer" 
-        onClick={() => onChange(!checked)}
-      >
-        <div className={`w-5 h-5 flex items-center justify-center rounded border ${checked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'}`}>
-          {checked && <Check className="h-3.5 w-3.5 text-white" />}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header with branding and info block */}
-      <header className="w-full flex justify-between items-center px-6 sm:px-8 lg:px-12 pt-4">
-        <div className="bg-blue-100 px-4 py-1.5 rounded-full flex items-center">
-          <span className="text-blue-800 font-medium">Prointerview</span>
-        </div>
-        <div className="text-gray-600 text-sm font-medium">
-          Ответы на вопросы
-        </div>
-      </header>
+      <Header />
       
       {/* Main content with reduced top padding */}
       <main className="flex-1 flex flex-col md:flex-row items-center justify-center py-2 sm:py-4 md:py-6 px-6 sm:px-8 lg:px-12 gap-8 md:gap-20">
@@ -185,84 +156,18 @@ const Index = () => {
 
         {/* Right side upload card with blue shadow */}
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 shadow-[0_10px_35px_-5px_rgba(59,130,246,0.3)]">
-            {uploadedFile ? (
-              <div className="flex flex-col items-center justify-center space-y-4">
-                <div className="w-16 h-16 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                </div>
-                <div className="text-center">
-                  <p className="font-medium text-gray-800 break-all">{uploadedFile.name}</p>
-                  <p className="text-sm text-gray-500 mt-1">Uploaded {uploadDate}</p>
-                </div>
-                
-                <button
-                  className={`w-full mt-4 flex items-center justify-center rounded-md px-8 py-3 font-medium text-white transition-colors ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
-                  onClick={handleContinue}
-                  disabled={isUploading || !consentChecked}
-                >
-                  {isUploading ? 'Отправка...' : 'Продолжить'}
-                </button>
-                
-                {uploadError && (
-                  <p className="mt-2 text-sm text-red-500">{uploadError}</p>
-                )}
-                
-                {/* Consent checkbox - moved below buttons */}
-                <div className="mt-4 flex items-start space-x-2">
-                  <Checkbox 
-                    checked={consentChecked} 
-                    onChange={setConsentChecked} 
-                  />
-                  <span className="text-sm text-gray-600">
-                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col">
-                <ResumeDropzone onFileUploaded={handleFileUploaded} />
-                
-                <button
-                  className={`w-full mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors ${consentChecked && uploadedFile ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
-                  onClick={handleContinue}
-                  disabled={isUploading || !consentChecked || !uploadedFile}
-                >
-                  {isUploading ? 'Отправка...' : 'Продолжить'}
-                </button>
-                
-                {/* "Загрузить резюме позже" button */}
-                <div className="mt-4 w-full">
-                  <Button 
-                    variant="outline"
-                    onClick={handleSkipResume}
-                    disabled={isSkipping}
-                    className="w-full text-indigo-600 border-indigo-200 hover:bg-indigo-50"
-                  >
-                    {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
-                  </Button>
-                </div>
-                
-                {/* Consent checkbox - moved below buttons */}
-                <div className="mt-4 flex items-start space-x-2">
-                  <Checkbox 
-                    checked={consentChecked} 
-                    onChange={setConsentChecked} 
-                  />
-                  <span className="text-sm text-gray-600">
-                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
-                  </span>
-                </div>
-                
-                {uploadError && (
-                  <p className="mt-2 text-sm text-red-500 text-center">{uploadError}</p>
-                )}
-              </div>
-            )}
-          </div>
+          <UploadFormCard 
+            uploadedFile={uploadedFile}
+            uploadDate={uploadDate}
+            isUploading={isUploading}
+            isSkipping={isSkipping}
+            uploadError={uploadError}
+            consentChecked={consentChecked}
+            setConsentChecked={setConsentChecked}
+            handleFileUploaded={handleFileUploaded}
+            handleContinue={handleContinue}
+            handleSkipResume={handleSkipResume}
+          />
         </div>
       </main>
     </div>
