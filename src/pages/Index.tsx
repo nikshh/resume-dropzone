@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import ResumeDropzone from '@/components/ResumeDropzone';
 import { Upload, Check } from 'lucide-react';
@@ -198,17 +199,6 @@ const Index = () => {
                   <p className="text-sm text-gray-500 mt-1">Uploaded {uploadDate}</p>
                 </div>
                 
-                {/* Consent checkbox */}
-                <div className="mt-2 flex items-start space-x-2">
-                  <Checkbox 
-                    checked={consentChecked} 
-                    onChange={setConsentChecked} 
-                  />
-                  <span className="text-sm text-gray-600">
-                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
-                  </span>
-                </div>
-                
                 <button
                   className={`w-full mt-4 flex items-center justify-center rounded-md px-8 py-3 font-medium text-white transition-colors ${consentChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
                   onClick={handleContinue}
@@ -220,12 +210,8 @@ const Index = () => {
                 {uploadError && (
                   <p className="mt-2 text-sm text-red-500">{uploadError}</p>
                 )}
-              </div>
-            ) : (
-              <div className="flex flex-col">
-                <ResumeDropzone onFileUploaded={handleFileUploaded} />
                 
-                {/* Consent checkbox */}
+                {/* Consent checkbox - moved below buttons */}
                 <div className="mt-4 flex items-start space-x-2">
                   <Checkbox 
                     checked={consentChecked} 
@@ -235,6 +221,10 @@ const Index = () => {
                     Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
                   </span>
                 </div>
+              </div>
+            ) : (
+              <div className="flex flex-col">
+                <ResumeDropzone onFileUploaded={handleFileUploaded} />
                 
                 <button
                   className={`w-full mt-6 rounded-md px-6 py-3 font-medium text-white transition-colors ${consentChecked && uploadedFile ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-400 cursor-not-allowed'}`}
@@ -244,7 +234,7 @@ const Index = () => {
                   {isUploading ? 'Отправка...' : 'Продолжить'}
                 </button>
                 
-                {/* "Загрузить резюме позже" button - moved here under the Continue button */}
+                {/* "Загрузить резюме позже" button */}
                 <div className="mt-4 w-full">
                   <Button 
                     variant="outline"
@@ -254,6 +244,17 @@ const Index = () => {
                   >
                     {isSkipping ? 'Обработка...' : 'Загрузить резюме позже'}
                   </Button>
+                </div>
+                
+                {/* Consent checkbox - moved below buttons */}
+                <div className="mt-4 flex items-start space-x-2">
+                  <Checkbox 
+                    checked={consentChecked} 
+                    onChange={setConsentChecked} 
+                  />
+                  <span className="text-sm text-gray-600">
+                    Я согласен(а), с <a href="https://prointerview.ru/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">политикой обработки персональных данных</a> и <a href="https://prointerview.ru/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">офертой</a>
+                  </span>
                 </div>
                 
                 {uploadError && (
